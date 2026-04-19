@@ -1,0 +1,81 @@
+﻿@model FinanceTracker.DTO.TransactionCreateUpdateDto
+@{
+    Layout = null;
+}
+<form id="createTransactionForm" asp-action="Create" method="post">
+    <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Новая транзакция</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Type" class="form-label fw-semibold"></label>
+                <select asp-for="Type" class="form-select" id="TransactionType">
+                    <option value="">Выберите тип</option>
+                    <option value="Income">Доход</option>
+                    <option value="Expense">Расход</option>
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="Amount" class="form-label fw-semibold"></label>
+                <div class="input-group"><span class="input-group-text">₽</span><input asp-for="Amount" class="form-control" type="number" step="0.01" placeholder="0.00" /></div>
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label fw-semibold"></label>
+            <input asp-for="Description" class="form-control" placeholder="Например: Покупка продуктов" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Date" class="form-label fw-semibold"></label>
+                <input asp-for="Date" class="form-control" type="date" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="CategoryId" class="form-label fw-semibold"></label>
+                <select asp-for="CategoryId" class="form-select" id="CategoryId">
+                    <option value="">Выберите категорию</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </div>
+</form>
+
+<script>
+    var allCategories = @Html.Raw(Json.Serialize(Model.AvailableCategories ?? new List<FinanceTracker.DTO.CategoryDto>()));
+    function filterCategoriesInForm() {
+        var typeSelect = document.getElementById('TransactionType');
+        var selectedType = typeSelect ? typeSelect.value : null;
+        var categorySelect = document.getElementById('CategoryId');
+        var currentValue = categorySelect.value;
+        categorySelect.innerHTML = '<option value="">Выберите категорию</option>';
+        if (!selectedType) return;
+        var filtered = allCategories.filter(function(cat) {
+            return !cat.defaultType || cat.defaultType === selectedType;
+        });
+        filtered.forEach(function(cat) {
+            var option = document.createElement('option');
+            option.value = cat.id;
+            option.text = cat.icon + ' ' + cat.name;
+            if (currentValue && currentValue == cat.id) option.selected = true;
+            categorySelect.appendChild(option);
+        });
+    }
+    var typeSelect = document.getElementById('TransactionType');
+    if (typeSelect) {
+        typeSelect.addEventListener('change', filterCategoriesInForm);
+        filterCategoriesInForm();
+    }
+    $.validator.unobtrusive.parse("#createTransactionForm");
+    window.filterCategoriesInForm = filterCategoriesInForm;
+</script>

@@ -1,0 +1,44 @@
+﻿@model FinanceTracker.DTO.CategoryDto
+@{
+    ViewData["Title"] = "Редактировать категорию";
+}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3"><h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Редактировать категорию</h4></div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
+                        <div class="mb-3"><label asp-for="Icon" class="form-label">Иконка (эмодзи)</label><input asp-for="Icon" class="form-control" /><span asp-validation-for="Icon" class="text-danger"></span></div>
+                        <div class="mb-3">
+                            <label asp-for="Color" class="form-label">Цвет (HEX)</label>
+                            <div class="input-group"><span class="input-group-text" id="colorPreview" style="background-color:@(Model.Color ?? "#6c757d"); width:40px"></span><input asp-for="Color" class="form-control" /></div>
+                            <span asp-validation-for="Color" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="DefaultType" class="form-label">Тип категории</label>
+                            <select asp-for="DefaultType" class="form-select" asp-items="Html.GetEnumSelectList<FinanceTracker.Models.TransactionType>()"></select>
+                            <span asp-validation-for="DefaultType" class="text-danger"></span>
+                        </div>
+                        <div class="d-flex justify-content-between"><a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left me-1"></i>Назад</a><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Сохранить</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.getElementById('Color').addEventListener('input', function() {
+            var color = this.value;
+            var preview = document.getElementById('colorPreview');
+            preview.style.backgroundColor = /^#[0-9A-Fa-f]{6}$/.test(color) ? color : '#6c757d';
+        });
+    </script>
+}

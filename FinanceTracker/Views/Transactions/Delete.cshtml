@@ -1,0 +1,33 @@
+﻿@model FinanceTracker.DTO.TransactionDto
+@{
+    ViewData["Title"] = "Удалить транзакцию";
+}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white py-3"><h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Подтверждение удаления</h4></div>
+                <div class="card-body">
+                    <p class="lead">Вы уверены, что хотите удалить эту транзакцию?</p>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-4">Дата</dt>
+                        <dd class="col-sm-8">@Model.Date.ToString("dd.MM.yyyy")</dd>
+                        <dt class="col-sm-4">Описание</dt>
+                        <dd class="col-sm-8">@Model.Description</dd>
+                        <dt class="col-sm-4">Категория</dt>
+                        <dd class="col-sm-8"><span class="badge" style="background-color:@Model.CategoryColor">@Model.CategoryIcon @Model.CategoryName</span></dd>
+                        <dt class="col-sm-4">Сумма</dt>
+                        <dd class="col-sm-8 fw-bold @(Model.Type == "Income" ? "text-success" : "text-danger")">@Model.Amount.ToString("C")</dd>
+                        <dt class="col-sm-4">Тип</dt>
+                        <dd class="col-sm-8">@(Model.Type == "Income" ? Html.Raw("<span class=\"badge bg-success\">Доход</span>") : Html.Raw("<span class=\"badge bg-danger\">Расход</span>"))</dd>
+                    </dl>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-between"><a asp-action="Index" class="btn btn-secondary"><i class="bi bi-x-lg me-1"></i>Отмена</a><button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i>Удалить</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

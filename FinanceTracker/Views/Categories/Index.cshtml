@@ -1,0 +1,50 @@
+﻿@model List<FinanceTracker.DTO.CategoryDto>
+@{
+    ViewData["Title"] = "Категории";
+}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="display-6 fw-semibold"><i class="bi bi-tags me-2"></i>Категории</h1>
+        <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-lg me-1"></i>Создать категорию</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 shadow-sm" style="border-left: 4px solid @(item.Color ?? "#6c757d");">
+                        <div class="card-body text-center">
+                            <div style="font-size: 3rem;">@item.Icon</div>
+                            <h5 class="mt-2">@item.Name</h5>
+                            <p><span class="badge @(item.DefaultType == "Income" ? "bg-success" : "bg-danger")">@(item.DefaultType == "Income" ? "Доход" : "Расход")</span></p>
+                            @if (item.TransactionCount > 0)
+                            {
+                                <hr />
+                                <div class="small text-muted">Транзакций: @item.TransactionCount<br />Общая сумма: @item.TotalAmount.ToString("C")</div>
+                            }
+                        </div>
+                        <div class="card-footer bg-white text-center">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-square"></i> Редактировать</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Удалить</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">Нет категорий. Создайте первую!</div>
+    }
+</div>

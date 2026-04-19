@@ -1,0 +1,38 @@
+﻿@model FinanceTracker.DTO.LoginDto
+@{
+    ViewData["Title"] = "Вход";
+}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white"><h4><i class="bi bi-box-arrow-in-right me-2"></i>Вход</h4></div>
+                <div class="card-body">
+                    <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label"></label>
+                            <div class="input-group"><span class="input-group-text"><i class="bi bi-person"></i></span><input asp-for="Username" class="form-control" /></div>
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <div class="input-group"><span class="input-group-text"><i class="bi bi-lock"></i></span><input asp-for="Password" class="form-control" type="password" /></div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check-circle me-1"></i>Войти</button>
+                    </form>
+                    <hr />
+                    <p class="text-muted">Тестовый аккаунт: test / test</p>
+                    <div class="text-center"><a href="/Account/Register" class="btn btn-link">Регистрация</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

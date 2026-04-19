@@ -1,0 +1,28 @@
+﻿@model FinanceTracker.DTO.TransactionDto
+@{
+    Layout = null;
+}
+<form id="deleteTransactionForm" asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Подтверждение удаления</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        <p>Вы уверены, что хотите удалить транзакцию?</p>
+        <dl class="row">
+            <dt class="col-sm-4">Дата</dt>
+            <dd class="col-sm-8">@Model.Date.ToString("dd.MM.yyyy")</dd>
+            <dt class="col-sm-4">Описание</dt>
+            <dd class="col-sm-8">@Model.Description</dd>
+            <dt class="col-sm-4">Категория</dt>
+            <dd class="col-sm-8"><span class="badge" style="background-color:@Model.CategoryColor">@Model.CategoryIcon @Model.CategoryName</span></dd>
+            <dt class="col-sm-4">Сумма</dt>
+            <dd class="col-sm-8 fw-bold @(Model.Type == "Income" ? "text-success" : "text-danger")">@Model.Amount.ToString("C")</dd>
+        </dl>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-danger">Удалить</button>
+    </div>
+</form>

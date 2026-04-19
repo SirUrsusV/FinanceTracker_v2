@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Выход";
+    Layout = "_Layout";
+}
+<div class="text-center">
+    <h2>Выход из системы</h2>
+    <form method="post" asp-action="Logout" asp-controller="Account">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger">Подтвердить выход</button>
+    </form>
+</div>
