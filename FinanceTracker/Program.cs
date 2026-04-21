@@ -76,7 +76,14 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=About}/{id?}");
 
-// Seed test user and default categories
+// 1. Apply migrations (create tables) FIRST
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+
+// 2. Seed test user and default categories AFTER migrations
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
@@ -102,13 +109,6 @@ using (var scope = app.Services.CreateScope())
             await dbContext.SaveChangesAsync();
         }
     }
-}
-
-// Apply migrations automatically
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
 }
 
 app.Run();
