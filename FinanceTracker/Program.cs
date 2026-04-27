@@ -4,7 +4,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.Text;
+
+//Заглушка под разные валюты
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("ru-RU");
 
 var builder = WebApplication.CreateBuilder(args);
 
