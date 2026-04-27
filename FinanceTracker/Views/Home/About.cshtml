@@ -17,10 +17,22 @@
                         <li>Фильтрация транзакций</li>
                         <li>Безопасное хранение данных (каждый пользователь видит только свои записи)</li>
                     </ul>
-                    <div class="text-center mt-4">
-                        <a href="/Account/Login" class="btn btn-primary">Войти</a>
-                        <a href="/Account/Register" class="btn btn-outline-secondary ms-2">Зарегистрироваться</a>
-                    </div>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="text-center mt-4">
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-primary" style="display:inline; cursor:pointer;">Выйти</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center mt-4">
+                            <a href="/Account/Login" class="btn btn-primary">Войти</a>
+                            <a href="/Account/Register" class="btn btn-outline-secondary ms-2">Зарегистрироваться</a>
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>

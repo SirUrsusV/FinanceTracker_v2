@@ -92,6 +92,33 @@ namespace FinanceTracker.Controllers
             return View(dashboard);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetChartData(int months)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var today = DateTime.Today;
+            var startDate = today.AddMonths(-months + 1); // +1 чтобы включить текущий месяц
+            var startOfMonth = new DateTime(startDate.Year, startDate.Month, 1);
+
+            var transactions = await _context.Transactions
+                .Include(t => t.Category)
+                .Where(t => t.UserId == userId && t.Date >= startOfMonth && t.Date <= today)
+                .ToListAsync();
+
+            var monthlyData = transactions
+                .GroupBy(t => new { t.Date.Year, t.Date.Month })
+                .Select(g => new MonthlyDataDto
+                {
+                    Month = $"{g.Key.Month:00}/{g.Key.Year}",
+                    Income = g.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
+                    Expense = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
+                })
+                .OrderBy(m => m.Month)
+                .ToList();
+
+            return Json(monthlyData);
+        }
+
         [AllowAnonymous]
         public IActionResult Error()
         {

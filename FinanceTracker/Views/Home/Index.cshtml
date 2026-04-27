@@ -110,8 +110,17 @@
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header bg-white border-0 pt-3 pb-0"><h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Динамика доходов и расходов</h5></div>
-                    <div class="card-body"><canvas id="monthlyChart" width="100%" height="50%"></canvas></div>
+                    <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Динамика доходов и расходов</h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary chart-period" data-months="3">3 месяца</button>
+                            <button type="button" class="btn btn-outline-secondary chart-period active" data-months="6">6 месяцев</button>
+                            <button type="button" class="btn btn-outline-secondary chart-period" data-months="12">1 год</button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="height: 1%; width: 100%">
+                        <canvas id="monthlyChart" width="100%"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -132,53 +141,75 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        var monthlyData = @Html.Raw(Json.Serialize(Model.MonthlyData));
-        if (monthlyData && monthlyData.length) {
-            var ctx = document.getElementById('monthlyChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: monthlyData.map(m => m.month),
-                    datasets: [
-                        { label: 'Доходы', data: monthlyData.map(m => m.income), borderColor: 'rgb(25,135,84)', backgroundColor: 'rgba(25,135,84,0.1)', tension: 0.3, fill: true },
-                        { label: 'Расходы', data: monthlyData.map(m => m.expense), borderColor: 'rgb(220,53,69)', backgroundColor: 'rgba(220,53,69,0.1)', tension: 0.3, fill: true }
-                    ]
+        let chart;
+        // Функция загрузки данных и перерисовки графика
+        function loadChartData(months) {
+            $.ajax({
+                url: '/Home/GetChartData',
+                type: 'GET',
+                data: { months: months },
+                success: function(data) {
+                    if (chart) {
+                        chart.destroy();
+                    }
+                    const ctx = document.getElementById('monthlyChart').getContext('2d');
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map(m => m.month),
+                            datasets: [
+                                {
+                                    label: 'Доходы',
+                                    data: data.map(m => m.income),
+                                    borderColor: 'rgb(25, 135, 84)',
+                                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                                    tension: 0.3,
+                                    fill: true,
+                                    pointBackgroundColor: 'rgb(25, 135, 84)'
+                                },
+                                {
+                                    label: 'Расходы',
+                                    data: data.map(m => m.expense),
+                                    borderColor: 'rgb(220, 53, 69)',
+                                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                    tension: 0.3,
+                                    fill: true,
+                                    pointBackgroundColor: 'rgb(220, 53, 69)'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { position: 'top' },
+                                tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(ctx.raw)}` } }
+                            },
+                            scales: {
+                                y: {
+                                    ticks: { callback: (value) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value) }
+                                }
+                            }
+                        }
+                    });
                 },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } }, scales: { y: { ticks: { callback: (v) => new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',minimumFractionDigits:0}).format(v) } } } }
+                error: function() {
+                    alert('Ошибка загрузки данных для графика');
+                }
             });
         }
 
-        // AJAX загрузка формы создания транзакции в модальное окно
-        $('#createModal').on('show.bs.modal', function () {
-            $('#createModalContent').load('/Transactions/CreateModal');
-        });
+        $(document).ready(function() {
+            // Загрузка начальных данных (6 месяцев)
+            loadChartData(6);
 
-        // Обработка отправки формы (AJAX)
-        $(document).on('submit', '#createTransactionForm', function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: form.serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        $('#createModal').modal('hide');
-                        location.reload(); // обновляем дашборд после добавления
-                    } else {
-                        $('#createModalContent').html(response);
-                        $.validator.unobtrusive.parse("#createTransactionForm");
-                    }
-                },
-                error: function () {
-                    alert('Ошибка сохранения транзакции.');
-                }
+            // Обработка нажатия на кнопки периода
+            $('.chart-period').click(function() {
+                $('.chart-period').removeClass('active');
+                $(this).addClass('active');
+                const months = $(this).data('months');
+                loadChartData(months);
             });
-        });
-
-        // Сброс содержимого при закрытии модального окна
-        $('#createModal').on('hidden.bs.modal', function () {
-            $('#createModalContent').html('<div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div></div>');
         });
     </script>
 }
